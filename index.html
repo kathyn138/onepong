@@ -15,40 +15,88 @@
     <canvas id="test" width="400" height="400"></canvas>
 
     <script type="text/javascript">
-        var canvas = document.getElementById('test');
-        var ctx = canvas.getContext('2d');
-        var x = canvas.width / 2;
-        var y = canvas.height - 30;
-        var dx = 2;
-        var dy = -2;
+        let canvas = document.getElementById('test');
+        let ctx = canvas.getContext('2d');
+        let x = canvas.width / 2;
+        let y = canvas.height - 30;
+        let dx = 2;
+        let dy = -2;
 
-        var circleRadius = 25;
+        let ballRadius = 15;
+        let paddleWidth = 100; 
+        let paddleHeight = 10; 
+        // sets paddle X position in center of canvas
+        let paddleX = (canvas.width - paddleWidth) / 2;
 
-        function drawCircle() {
+        let moveRight = false; 
+        let moveLeft = false; 
+
+        document.addEventListener("keydown", keyDownHandler, false);
+        document.addEventListener("keyup", keyUpHandler, false);
+
+        function keyDownHandler(e) {
+            if (e.key === "Right" || e.key === "ArrowRight") {
+                moveRight = true;
+            } else if (e.key === "Left" || e.key === "ArrowLeft") {
+                moveLeft = true; 
+            }
+        }
+
+        function keyUpHandler(e) {
+            if (e.key === "Right" || e.key === "ArrowRight") {
+                moveRight = false;
+            } else if (e.key === "Left" || e.key === "ArrowLeft") {
+                moveLeft = false; 
+            }
+        }
+
+        function drawBall() {
             ctx.beginPath();
-            ctx.arc(x, y, circleRadius, 0, Math.PI * 2);
-            ctx.fillStyle = '#FF9999'
+            ctx.arc(x, y, ballRadius, 0, Math.PI * 2);
+            ctx.fillStyle = '#FF9999';
+            ctx.fill();
+            ctx.closePath();
+        }
+
+        function drawPaddle() {
+            ctx.rect(paddleX, canvas.height - 20, paddleWidth, paddleHeight);
+            ctx.fillStyle = '#FF9999';
             ctx.fill();
             ctx.closePath();
         }
 
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            drawCircle();
+            drawBall();
+            drawPaddle();
 
-            // calculate collision point of wall and border of circle
-            // without - circleRadius, it'll calculate collision point of 
-            // wall and circle center
+            // calculate collision point of wall and border of ball
+            // without - ballRadius, it'll calculate collision point of 
+            // wall and ball center
 
-            if (x + dx > canvas.width - circleRadius || x + dx < circleRadius) {
+            if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) {
                 dx = -dx;
             }
-            if (y + dy > canvas.height - circleRadius || y + dy < circleRadius) {
+            if (y + dy > canvas.height - ballRadius || y + dy < ballRadius) {
                 dy = -dy;
             }
 
             x += dx;
             y += dy;
+
+            if (moveRight) {
+                paddleX += 4; 
+
+                if (paddleX + paddleWidth > canvas.width) {
+                    paddleX = canvas.width - paddleWidth; 
+                }
+            } else if (moveLeft) {
+                paddleX -= 4;
+
+                if (paddleX < 0) {
+                    paddleX = 0; 
+                }
+            }
         }
 
         setInterval(draw, 10);
